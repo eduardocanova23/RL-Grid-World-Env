@@ -1,4 +1,4 @@
-from source import GridWorldEnv
+from gridworld3 import GridWorldEnv3
 import gym
 import time
 from stable_baselines3 import PPO
@@ -6,12 +6,12 @@ from stable_baselines3.common.env_util import make_vec_env
 import os
 
 log_path = os.path.join('Training', 'Logs')
-env = GridWorldEnv(render_mode="rgb_array")
+env = GridWorldEnv3(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 model = PPO('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path)
 obs = env.reset()
 
-env_see = GridWorldEnv(render_mode="human")
+env_see = GridWorldEnv3(render_mode="human")
 env_see.reset()
 
 # while True:
@@ -29,7 +29,7 @@ env_see.reset()
 # env.close()
 
 env_see.reset()
-model.learn(total_timesteps=20000)
+model.learn(total_timesteps=100000)
 done =  False
 print(f'Estado: {obs}')
 total_reward = 0

@@ -9,18 +9,22 @@ import time
 import pygame
 
 font = cv2.FONT_HERSHEY_COMPLEX_SMALL 
-class GridWorldEnv(gym.Env):
+class GridWorldEnv3(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
 
     def __init__(self, render_mode=None, size=4):
         self.size = size  # The size of the square grid
         self.window_size = 512  # The size of the PyGame window
-        self.reward_matrix = np.array([[-1,-1,-1,-1],[10,3,-1,-1], [-1, -1,-1,-1],[-1, -1,-1,13]])
+        self.reward_matrix = np.array([[-1,-1,-1,-1],[10,3,-1,-1], [-1, -1,-1,-1],[-1, -1,-1,14]])
         # Observations are dictionaries with the agent's and the target's location.
         # Each location is encoded as an element of {0, ..., `size`}^2, i.e. MultiDiscrete([size, size]).
         self.observation_space = spaces.Dict(
             {
                 "agent": spaces.Box(0, size - 1, shape=(2,), dtype=int),
+                "left": spaces.Discrete(5),
+                "right": spaces.Discrete(5),
+                "up": spaces.Discrete(5),
+                "down": spaces.Discrete(5)
                 #"target": spaces.Box(0, size - 1, shape=(2,), dtype=int),
             }
         )
@@ -40,6 +44,13 @@ class GridWorldEnv(gym.Env):
             3: np.array([0, -1]),
         }
 
+        self._reward_to_obs = {
+            -1: 1,
+            3: 2,
+            13: 3,
+            10: 4,
+        }
+
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
 
@@ -54,7 +65,7 @@ class GridWorldEnv(gym.Env):
         self.clock = None
 
     def _get_obs(self):
-        return {"agent": self._agent_location} # , "target": self._target_location
+        return {"agent": self._agent_location, "left" : self._reward_left, "right": self._reward_right, "up": self._reward_up, "down": self._reward_down} 
 
     def _get_info(self):
         return {"distance": np.linalg.norm(self._agent_location - self._target_location, ord=1)}
@@ -62,10 +73,16 @@ class GridWorldEnv(gym.Env):
     def reset(self, seed=None, options=None):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
+        
         self.total_reward = 0
+        
         # Choose the agent's location uniformly at random
         self._agent_location = self.np_random.integers(0, self.size, size=2, dtype=int)
+
+
+
         self.reward_matrix = np.array([[-1,-1,-1,-1],[10,3,-1,-1], [-1, -1,-1,-1],[-1, -1,-1,13]])
+
         # We will sample the target's location randomly until it does not coincide with the agent's location
         self._target_location = np.array([1, 0])
         while np.array_equal(self._target_location, self._agent_location):
@@ -73,6 +90,32 @@ class GridWorldEnv(gym.Env):
 
         self._ydiamond_location = np.array([3,3])
         self._bdiamond_location = np.array([1,1])
+
+        agent_location_right = np.clip(
+            self._agent_location + np.array([1, 0]), 0, self.size - 1
+        )
+
+        agent_location_left = np.clip(
+            self._agent_location + np.array([-1, 0]), 0, self.size - 1
+        )
+
+        agent_location_up = np.clip(
+            self._agent_location + np.array([0, -1]), 0, self.size - 1
+        )
+
+        agent_location_down = np.clip(
+            self._agent_location + np.array([0, 1]), 0, self.size - 1
+        )
+
+        true_reward_right = self.reward_matrix[agent_location_right[0], agent_location_right[1]]
+        true_reward_left = self.reward_matrix[agent_location_left[0], agent_location_left[1]]
+        true_reward_up = self.reward_matrix[agent_location_up[0], agent_location_up[1]]
+        true_reward_down = self.reward_matrix[agent_location_down[0], agent_location_down[1]]
+        
+        self._reward_right = self._reward_to_obs[int(true_reward_right)]
+        self._reward_left = self._reward_to_obs[int(true_reward_left)]
+        self._reward_up = self._reward_to_obs[int(true_reward_up)]
+        self._reward_down = self._reward_to_obs[int(true_reward_down)]
 
         observation = self._get_obs()
         info = self._get_info()
@@ -95,17 +138,47 @@ class GridWorldEnv(gym.Env):
         reward = self.reward_matrix[self._agent_location[0], self._agent_location[1]]
         self.total_reward += reward
         if np.array_equal(self._agent_location, np.array([3,3])):
-            self.reward_matrix[3,3] = -1
+            if self.reward_matrix[3,3] != -1:
+                self.reward_matrix[3,3] = -1
+
             self._ydiamond_location = np.array([4,4])
             self._bdiamond_location = np.array([4,4])
+            
 
         if np.array_equal(self._agent_location, np.array([1,1])):
-            self.reward_matrix[1,1] = -1
+            if self.reward_matrix[1,1] != -1:
+                self.reward_matrix[1,1] = -1
             self._bdiamond_location = np.array([4,4])
             self._ydiamond_location = np.array([4,4])
-
+            self._collected_diamonds = 1
         
-          
+        
+        agent_location_right = np.clip(
+            self._agent_location + np.array([1, 0]), 0, self.size - 1
+        )
+
+        agent_location_left = np.clip(
+            self._agent_location + np.array([-1, 0]), 0, self.size - 1
+        )
+
+        agent_location_up = np.clip(
+            self._agent_location + np.array([0, -1]), 0, self.size - 1
+        )
+
+        agent_location_down = np.clip(
+            self._agent_location + np.array([0, 1]), 0, self.size - 1
+        )
+
+        true_reward_right = self.reward_matrix[agent_location_right[0], agent_location_right[1]]
+        true_reward_left = self.reward_matrix[agent_location_left[0], agent_location_left[1]]
+        true_reward_up = self.reward_matrix[agent_location_up[0], agent_location_up[1]]
+        true_reward_down = self.reward_matrix[agent_location_down[0], agent_location_down[1]]
+        
+        self._reward_right = self._reward_to_obs[int(true_reward_right)]
+        self._reward_left = self._reward_to_obs[int(true_reward_left)]
+        self._reward_up = self._reward_to_obs[int(true_reward_up)]
+        self._reward_down = self._reward_to_obs[int(true_reward_down)]
+
         observation = self._get_obs()
         info = self._get_info()
 
@@ -205,14 +278,3 @@ class GridWorldEnv(gym.Env):
         if self.window is not None:
             pygame.display.quit()
             pygame.quit()
-
-
-from gym.envs.registration import register
-
-# register(
-#     id='gym_examples/GridWorld-v0',
-#     entry_point='gym_examples.envs:GridWorldEnv',
-#     max_episode_steps=30,
-#     reward_threshold = 16,
-# )
-
