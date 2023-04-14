@@ -1,15 +1,15 @@
-from gridworld2 import GridWorldEnv2
+from gridworld5 import GridWorldEnv5
 import gym
 import time
 import os
 
-env = GridWorldEnv2(render_mode="rgb_array")
+env = GridWorldEnv5(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 obs = env.reset()
 
-env.train_QLearning(n_episodes=100000)
+env.train_QLearning(n_episodes=300000)
 total_reward = 0
-env.reset()
+env.reset(exec=True)
 done = False
 
 while not done:
