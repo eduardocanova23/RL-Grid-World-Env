@@ -13,7 +13,7 @@ font = cv2.FONT_HERSHEY_COMPLEX_SMALL
 class GridWorldEnv3(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
 
-    def __init__(self,render_mode=None,size=4,exploration_max=0.99,exploration_min=0,exploration_decay=0.999994,gamma=0.9,max_steps=16,learning_rate=0.9):
+    def __init__(self,render_mode=None,size=4,exploration_max=0.80,exploration_min=0,exploration_decay=1.0,gamma=0.9,max_steps=18,learning_rate=0.9):
         self.size = size  # The size of the square grid
         self.window_size = 512  # The size of the PyGame window
         self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[13, -1,-1,-1]])
@@ -312,17 +312,11 @@ class GridWorldEnv3(gym.Env):
                 action = a
         return action
 
-    def maxTable(self, action):
-
-        direction = self._action_to_direction[int(action)]
-        # We use `np.clip` to make sure we don't leave the grid
-        next_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+    def maxTable(self):
 
         max = -math.inf
         for a in range(4):
-            compare = self.table[next_location[0],next_location[1], self._left, self._right, self._up, self._down , a]
+            compare = self.table[self._agent_location[0],self._agent_location[1], self._left, self._right, self._up, self._down , a]
 
             if compare > max:
                 max = compare
@@ -358,18 +352,29 @@ class GridWorldEnv3(gym.Env):
 
         self.createTable()
         for e in range(n_episodes):
-
+            
+            
             self.reset()
             steps = 0
 
             while (not self.terminated) and steps <= self.max_steps:
-
+                
+                
                 steps += 1
                 action = self.getaction()
+
+                old_location = self._agent_location
+                old_left = self._left
+                old_right = self._right
+                old_up = self._up
+                old_down = self._down
+
+                old_Q = self.table[self._agent_location[0],self._agent_location[1],self._left,self._right,self._up,self._down,action]
+
                 next_state, reward, done, info = self.step(action)
-                self.table[self._agent_location[0],self._agent_location[1],self._left,self._right,self._up,self._down,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable(action) 
-                - self.table[self._agent_location[0],self._agent_location[1],self._left,self._right,self._up,self._down,action]))
-                 + self.table[self._agent_location[0],self._agent_location[1],self._left,self._right,self._up,self._down,action])  
+
+                self.table[old_location[0],old_location[1],self._left,self._right,self._up,self._down,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
+                - old_Q)) + old_Q)  
 
 
     def close(self):

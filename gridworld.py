@@ -270,10 +270,19 @@ class GridWorldEnv(gym.Env):
 
                 steps += 1
                 action = self.getaction()
+
+                old_location = self._agent_location
+                old_left = self._left
+                old_right = self._right
+                old_up = self._up
+                old_down = self._down
+
+                old_Q = self.table[self._agent_location[0],self._agent_location[1],self._left,self._right,self._up,self._down,action]
+
                 next_state, reward, done, info = self.step(action)
-                self.table[self._agent_location[0],self._agent_location[1],action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
-                - self.table[self._agent_location[0],self._agent_location[1],action]))
-                 + self.table[self._agent_location[0],self._agent_location[1],action])  
+
+                self.table[old_location[0],old_location[1],self._left,self._right,self._up,self._down,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
+                - old_Q)) + old_Q)
 
 
     def close(self):

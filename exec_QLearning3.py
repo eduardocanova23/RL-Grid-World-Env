@@ -13,7 +13,7 @@ env.reset(exec=True)
 done = False
 max_steps = 15
 
-while not done or max_steps != 0:
+while not done and max_steps != 0:
     
     max_steps -= 1
     action = env.argmaxTable() 
