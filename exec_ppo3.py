@@ -14,19 +14,7 @@ obs = env.reset()
 env_see = GridWorldEnv3(render_mode="human")
 env_see.reset()
 
-# while True:
-#     # Take a random action
-#     time.sleep(1)
-#     action = env_see.action_space.sample()
-#     print(action)
-#     obs, reward, done, info = env_see.step(action)
-    
-#     # Render the game
-#     env_see.render()
-#     if done == True:
-#         break
 
-# env.close()
 
 env_see.reset()
 model.learn(total_timesteps=100000)
