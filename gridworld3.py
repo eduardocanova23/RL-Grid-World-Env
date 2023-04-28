@@ -13,7 +13,7 @@ font = cv2.FONT_HERSHEY_COMPLEX_SMALL
 class GridWorldEnv3(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
 
-    def __init__(self,render_mode=None,size=4,exploration_max=0.80,exploration_min=0,exploration_decay=1.0,gamma=0.9,max_steps=18,learning_rate=0.9):
+    def __init__(self,render_mode=None,size=4,exploration_max=0.90,exploration_min=0,exploration_decay=1.0,gamma=0.9,max_steps=18,learning_rate=0.9):
         self.size = size  # The size of the square grid
         self.window_size = 512  # The size of the PyGame window
         self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[13, -1,-1,-1]])

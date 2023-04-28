@@ -7,3 +7,4 @@ The versions are the following:<br>
 3 - Position and value of each reward in every 4 directions from the agent are accounted <br>
 4 - Position and timestamp are accounted <br>
 5 - Binary verison of 3: instead of reward value, there is a binary marker that says wether it's a positive reward or a negative reward <br>
+

@@ -1,21 +1,19 @@
-from gridworld3 import GridWorldEnv3
+from gridworld6 import GridWorldEnv6
 import gym
 import time
 import os
 
-env = GridWorldEnv3(render_mode="rgb_array")
+env = GridWorldEnv6(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 obs = env.reset()
 
-env.train_QLearning(n_episodes=1000000)
+env.train_QLearning(n_episodes=300000)
 total_reward = 0
 env.reset(exec=True)
 done = False
-max_steps = 15
 
-while not done and max_steps != 0:
+while not done:
     
-    max_steps -= 1
     action = env.argmaxTable() 
     obs, rewards, done, info = env.step(action)
     env.render()
