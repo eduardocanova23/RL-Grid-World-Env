@@ -7,9 +7,10 @@ env = GridWorldEnv6(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 obs = env.reset()
 
-env.train_QLearning(n_episodes=300000)
+env.train_QLearning(n_episodes=200000)
 total_reward = 0
 env.reset(exec=True)
+env.render_mode = "human"
 done = False
 
 while not done:
