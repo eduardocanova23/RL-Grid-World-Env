@@ -316,14 +316,11 @@ class GridWorldEnv5(gym.Env):
         self.table = np.zeros((4, 4, 2,2,2,2, 4))
 
     def argmaxTable(self):
-        max = -math.inf
-        action = -1
-        for a in range(4):
-            compare = self.table[self._agent_location[0], self._agent_location[1], self._left, self._right, self._up, self._down , a]
-            if compare > max:
-                max = compare
-                action = a
-        return action
+        # Returns action which results in highest Q value for current position
+        compare = self.table[self._agent_location[0],self._agent_location[1], self._left, self._right, self._up, self._down]
+        winners = np.argwhere(compare == np.amax(compare))
+        winners_list = winners.flatten().tolist()
+        return random.choice(winners_list)
 
     def maxTable(self, action):
 

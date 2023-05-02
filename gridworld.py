@@ -214,14 +214,11 @@ class GridWorldEnv(gym.Env):
         self.table = np.zeros((4, 4, 4))
 
     def argmaxTable(self):
-        max = -math.inf
-        action = -1
-        for a in range(4):
-            compare = self.table[self._agent_location[0], self._agent_location[1], a]
-            if compare > max:
-                max = compare
-                action = a
-        return action
+        # Returns action which results in highest Q value for current position
+        compare = self.table[self._agent_location[0],self._agent_location[1]]
+        winners = np.argwhere(compare == np.amax(compare))
+        winners_list = winners.flatten().tolist()
+        return random.choice(winners_list)
 
     def maxTable(self):
         max = -math.inf
@@ -272,16 +269,12 @@ class GridWorldEnv(gym.Env):
                 action = self.getaction()
 
                 old_location = self._agent_location
-                old_left = self._left
-                old_right = self._right
-                old_up = self._up
-                old_down = self._down
 
-                old_Q = self.table[self._agent_location[0],self._agent_location[1],self._left,self._right,self._up,self._down,action]
+                old_Q = self.table[self._agent_location[0],self._agent_location[1],action]
 
                 next_state, reward, done, info = self.step(action)
 
-                self.table[old_location[0],old_location[1],self._left,self._right,self._up,self._down,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
+                self.table[old_location[0],old_location[1],action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
                 - old_Q)) + old_Q)
 
 
