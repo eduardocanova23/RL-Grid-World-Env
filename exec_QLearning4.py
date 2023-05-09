@@ -2,15 +2,17 @@ from gridworld4 import GridWorldEnv4
 import gym
 import time
 import os
+import winsound
 
 env = GridWorldEnv4(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 obs = env.reset()
 
-env.train_QLearning(n_episodes=300000)
+env.train_QLearning(n_episodes=500000)
 total_reward = 0
 env.reset(exec=True)
 done = False
+winsound.Beep(2000, 1000)
 
 while not done:
     

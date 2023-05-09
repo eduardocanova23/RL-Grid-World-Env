@@ -322,17 +322,13 @@ class GridWorldEnv5(gym.Env):
         winners_list = winners.flatten().tolist()
         return random.choice(winners_list)
 
-    def maxTable(self, action):
+    def maxTable(self):
 
-        direction = self._action_to_direction[int(action)]
-        # We use `np.clip` to make sure we don't leave the grid
-        next_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        
 
         max = -math.inf
         for a in range(4):
-            compare = self.table[next_location[0],next_location[1], self._left, self._right, self._up, self._down , a]
+            compare = self.table[self._agent_location[0],self._agent_location[1], self._left, self._right, self._up, self._down , a]
 
             if compare > max:
                 max = compare

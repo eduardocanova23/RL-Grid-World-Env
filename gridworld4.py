@@ -279,16 +279,13 @@ class GridWorldEnv4(gym.Env):
                 action = self.getaction()
 
                 old_location = self._agent_location
-                old_left = self._left
-                old_right = self._right
-                old_up = self._up
-                old_down = self._down
+                old_time = self._time
 
-                old_Q = self.table[self._agent_location[0],self._agent_location[1],self._left,self._right,self._up,self._down,action]
+                old_Q = self.table[self._agent_location[0],self._agent_location[1],self._time,action]
 
                 next_state, reward, done, info = self.step(action)
 
-                self.table[old_location[0],old_location[1],self._left,self._right,self._up,self._down,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
+                self.table[old_location[0],old_location[1],old_time,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
                 - old_Q)) + old_Q)  
 
 

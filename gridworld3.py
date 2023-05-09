@@ -16,7 +16,7 @@ class GridWorldEnv3(gym.Env):
     def __init__(self,render_mode=None,size=4,exploration_max=0.90,exploration_min=0,exploration_decay=1.0,gamma=0.9,max_steps=18,learning_rate=0.9):
         self.size = size  # The size of the square grid
         self.window_size = 512  # The size of the PyGame window
-        self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[13, -1,-1,-1]])
+        self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[14, -1,-1,-1]])
         # Observations are dictionaries with the agent's and the target's location.
         # Each location is encoded as an element of {0, ..., `size`}^2, i.e. MultiDiscrete([size, size]).
         self.observation_space = spaces.Dict(
@@ -43,16 +43,16 @@ class GridWorldEnv3(gym.Env):
         I.e. 0 corresponds to "right", 1 to "up" etc.
         """
         self._action_to_direction = {
-            0: np.array([1, 0]),
-            1: np.array([0, 1]),
-            2: np.array([-1, 0]),
+            0: np.array([-1, 0]),
+            1: np.array([1, 0]),
+            2: np.array([0, 1]),
             3: np.array([0, -1]),
         }
 
         self._reward_to_obs = {
             -1: 0,
             3: 1,
-            13: 2,
+            14: 2,
             10: 3,
         }
 
@@ -81,7 +81,7 @@ class GridWorldEnv3(gym.Env):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
         self.total_reward = 0
-        self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[13, -1,-1,-1]])
+        self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[14, -1,-1,-1]])
         self._target_location = np.array([1, 3])
         # Choose the agent's location uniformly at random
         if not exec:
@@ -211,6 +211,62 @@ class GridWorldEnv3(gym.Env):
             self._render_frame()
 
         return observation, reward, self.terminated, info
+    
+
+    def mock_step(self, action):
+        
+        # Map the action (element of {0,1,2,3}) to the direction we walk in
+        direction = self._action_to_direction[int(action)]
+        # We use `np.clip` to make sure we don't leave the grid
+        next_location = np.clip(
+            self._agent_location + direction, 0, self.size - 1
+        )
+        # An episode is done if the agent has reached the target
+        
+
+
+        # RIGHT
+        direction = self._action_to_direction[0]
+        future_location = np.clip(
+            self._agent_location + direction, 0, self.size - 1
+        )
+        right = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
+
+        # LEFT
+        direction = self._action_to_direction[2]
+        future_location = np.clip(
+            self._agent_location + direction, 0, self.size - 1
+        )
+        left = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
+
+
+
+        # UP
+        direction = self._action_to_direction[1]
+        future_location = np.clip(
+            self._agent_location + direction, 0, self.size - 1
+        )
+        up = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
+
+
+
+        # DOWN
+        direction = self._action_to_direction[3]
+        future_location = np.clip(
+            self._agent_location + direction, 0, self.size - 1
+        )
+        down = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]] 
+
+        reward = self.reward_matrix[self._agent_location[0], self._agent_location[1]]
+        
+
+        observation = {"agent": next_location, "left": left, "right": right, "up": up, "down": down}
+        info = self._get_info()
+
+        
+
+        return observation, reward, self.terminated, info
+
 
     def get_total_reward(self):
         return int(self.total_reward)

@@ -8,7 +8,7 @@ import os
 log_path = os.path.join('Training', 'Logs')
 env = GridWorldEnv3(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
-model = PPO('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path)
+model = PPO('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path,batch_size=5)
 obs = env.reset()
 
 env_see = GridWorldEnv3(render_mode="human")
@@ -17,7 +17,7 @@ env_see.reset()
 
 
 env_see.reset()
-model.learn(total_timesteps=100000)
+model.learn(total_timesteps=60000)
 done =  False
 print(f'Estado: {obs}')
 total_reward = 0
