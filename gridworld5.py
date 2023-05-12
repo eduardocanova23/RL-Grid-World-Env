@@ -43,9 +43,9 @@ class GridWorldEnv5(gym.Env):
         I.e. 0 corresponds to "right", 1 to "up" etc.
         """
         self._action_to_direction = {
-            0: np.array([1, 0]),
-            1: np.array([0, 1]),
-            2: np.array([-1, 0]),
+            0: np.array([-1, 0]),
+            1: np.array([1, 0]),
+            2: np.array([0, 1]),
             3: np.array([0, -1]),
         }
 
@@ -90,7 +90,7 @@ class GridWorldEnv5(gym.Env):
 
         
         # RIGHT
-        direction = self._action_to_direction[0]
+        direction = self._action_to_direction[1]
         future_location = np.clip(
             self._agent_location + direction, 0, self.size - 1
         )
@@ -100,7 +100,7 @@ class GridWorldEnv5(gym.Env):
             self._right = 1
 
         # LEFT
-        direction = self._action_to_direction[2]
+        direction = self._action_to_direction[0]
         future_location = np.clip(
             self._agent_location + direction, 0, self.size - 1
         )
@@ -112,7 +112,7 @@ class GridWorldEnv5(gym.Env):
 
 
         # UP
-        direction = self._action_to_direction[1]
+        direction = self._action_to_direction[2]
         future_location = np.clip(
             self._agent_location + direction, 0, self.size - 1
         )
@@ -159,7 +159,7 @@ class GridWorldEnv5(gym.Env):
 
 
         # RIGHT
-        direction = self._action_to_direction[0]
+        direction = self._action_to_direction[1]
         future_location = np.clip(
             self._agent_location + direction, 0, self.size - 1
         )
@@ -169,7 +169,7 @@ class GridWorldEnv5(gym.Env):
             self._right = 1
 
         # LEFT
-        direction = self._action_to_direction[2]
+        direction = self._action_to_direction[0]
         future_location = np.clip(
             self._agent_location + direction, 0, self.size - 1
         )
@@ -181,7 +181,7 @@ class GridWorldEnv5(gym.Env):
 
 
         # UP
-        direction = self._action_to_direction[1]
+        direction = self._action_to_direction[2]
         future_location = np.clip(
             self._agent_location + direction, 0, self.size - 1
         )
@@ -383,7 +383,7 @@ class GridWorldEnv5(gym.Env):
 
                 next_state, reward, done, info = self.step(action)
 
-                self.table[old_location[0],old_location[1],self._left,self._right,self._up,self._down,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
+                self.table[old_location[0],old_location[1],old_left,old_right,old_up,old_down,action] = ((self.learning_rate*(reward+self.gamma*self.maxTable() 
                 - old_Q)) + old_Q)
 
 

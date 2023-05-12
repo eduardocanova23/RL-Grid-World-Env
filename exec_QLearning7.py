@@ -1,10 +1,10 @@
-from gridworld5 import GridWorldEnv5
+from gridworld7 import GridWorldEnv7
 import gym
 import time
 import os
 import winsound
 
-env = GridWorldEnv5(render_mode="rgb_array")
+env = GridWorldEnv7(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 obs = env.reset()
 
@@ -12,10 +12,13 @@ env.train_QLearning(n_episodes=200000)
 total_reward = 0
 env.reset(exec=True)
 done = False
-winsound.Beep(2000, 1000)
+max_steps = 15
+winsound.Beep(1000, 1000)
 
-while not done:
+
+while not done and max_steps != 0:
     
+    max_steps -= 1
     action = env.argmaxTable() 
     obs, rewards, done, info = env.step(action)
     env.render()

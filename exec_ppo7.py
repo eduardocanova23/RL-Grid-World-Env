@@ -1,34 +1,23 @@
-from gridworld3 import GridWorldEnv3
+from gridworld7 import GridWorldEnv7
 import gym
 import time
-from stable_baselines3 import DQN
+from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 import os
 
 log_path = os.path.join('Training', 'Logs')
-env = GridWorldEnv3(render_mode="rgb_array")
+env = GridWorldEnv7(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
-model = DQN('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path, gamma=0.9)
+model = PPO('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path)
 obs = env.reset()
 
-env_see = GridWorldEnv3(render_mode="human")
-env_see.reset()
+env_see = GridWorldEnv7(render_mode="human")
+env_see.reset(exec=True)
 
-# while True:
-#     # Take a random action
-#     time.sleep(1)
-#     action = env_see.action_space.sample()
-#     print(action)
-#     obs, reward, done, info = env_see.step(action)
-    
-#     # Render the game
-#     env_see.render()
-#     if done == True:
-#         break
 
-# env.close()
 
-model.learn(total_timesteps=150000)
+
+model.learn(total_timesteps=50000)
 done =  False
 print(f'Estado: {obs}')
 times_to_execute = 10
