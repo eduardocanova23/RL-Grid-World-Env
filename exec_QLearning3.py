@@ -8,12 +8,12 @@ env = GridWorldEnv3(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 obs = env.reset()
 
-env.train_QLearning(n_episodes=300000)
+env.train_QLearning(n_episodes=200000)
 total_reward = 0
 env.reset(exec=True)
 done = False
 max_steps = 15
-winsound.Beep(2000, 1000)
+winsound.Beep(1000, 1000)
 
 
 while not done and max_steps != 0:

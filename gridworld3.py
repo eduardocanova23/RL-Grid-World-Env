@@ -96,40 +96,61 @@ class GridWorldEnv3(gym.Env):
             self._agent_location = np.array([1,1])
 
         
-        # RIGHT
-        direction = self._action_to_direction[0]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        # What is the reward to the RIGHT of the agent?
+        direction = self._action_to_direction[1]
+        new_location = self._agent_location + direction
 
+        # Tests in case of teleport to the other side
+        if new_location[0]>3:
+            future_location = self._agent_location + np.array([-3, 0])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._right = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
-        
 
-        # LEFT
-        direction = self._action_to_direction[2]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        # What is the reward to the LEFT of the agent?
+        direction = self._action_to_direction[0]
+        new_location = self._agent_location + direction
 
+        # Tests in case of teleport to the other side
+        if new_location[0]<0:
+            future_location = self._agent_location + np.array([3, 0])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._left = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
 
 
-        # UP
-        direction = self._action_to_direction[1]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        # What is the reward UP from the agent?
+        direction = self._action_to_direction[2]
+        new_location = self._agent_location + direction
+
+        # Tests in case of teleport to the other side
+        if new_location[1]>3:
+            future_location = self._agent_location + np.array([0, -3])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._up = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
 
 
-        # DOWN
+        # What is the reward DOWN from the agent?
         direction = self._action_to_direction[3]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        new_location = self._agent_location + direction
+
+        # Tests in case of teleport to the other side
+        if new_location[1]<0:
+            future_location = self._agent_location + np.array([0, 3])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._down = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
 
@@ -148,58 +169,104 @@ class GridWorldEnv3(gym.Env):
         
         # Map the action (element of {0,1,2,3}) to the direction we walk in
         direction = self._action_to_direction[int(action)]
-        # We use `np.clip` to make sure we don't leave the grid
-        self._agent_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        new_location = self._agent_location + direction
+
+        # Tests in case of teleport to the other side
+        if new_location[0]>3:
+            self._agent_location += np.array([-3, 0])
+
+        elif new_location[0]<0:
+            self._agent_location += np.array([3, 0])
+
+        elif new_location[1]>3:
+            self._agent_location += np.array([0, -3])
+
+        elif new_location[1]<0:
+            self._agent_location += np.array([0, 3])
+
+        # No teleports
+        else:
+            self._agent_location = new_location
         # An episode is done if the agent has reached the target
         self.terminated = np.array_equal(self._agent_location, self._target_location)
         
 
 
-        # RIGHT
-        direction = self._action_to_direction[0]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        # What is the reward to the RIGHT of the agent?
+        direction = self._action_to_direction[1]
+        new_location = self._agent_location + direction
+
+        # Tests in case of teleport to the other side
+        if new_location[0]>3:
+            future_location = self._agent_location + np.array([-3, 0])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._right = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
-        # LEFT
-        direction = self._action_to_direction[2]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+
+        # What is the reward to the LEFT of the agent?
+        direction = self._action_to_direction[0]
+        new_location = self._agent_location + direction
+
+        # Tests in case of teleport to the other side
+        if new_location[0]<0:
+            future_location = self._agent_location + np.array([3, 0])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._left = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
 
 
-        # UP
-        direction = self._action_to_direction[1]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        # What is the reward UP from the agent?
+        direction = self._action_to_direction[2]
+        new_location = self._agent_location + direction
+
+        # Tests in case of teleport to the other side
+        if new_location[1]>3:
+            future_location = self._agent_location + np.array([0, -3])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._up = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
 
 
-        # DOWN
+        # What is the reward DOWN from the agent?
         direction = self._action_to_direction[3]
-        future_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        new_location = self._agent_location + direction
+
+        # Tests in case of teleport to the other side
+        if new_location[1]<0:
+            future_location = self._agent_location + np.array([0, 3])
+
+        # No teleports
+        else:
+            future_location = new_location
         self._down = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]] 
+
 
         reward = self.reward_matrix[self._agent_location[0], self._agent_location[1]]
         self.total_reward += reward
+
+        # Update reward matrix by deleting collected diamond and the uncollected diamond counterpart
         if np.array_equal(self._agent_location, np.array([3,0])):
             self.reward_matrix[3,0] = -1
             self.reward_matrix[1,2] = -1
+
+            # This exists to remove diamond from the rendered screen
             self._ydiamond_location = np.array([4,4])
             self._bdiamond_location = np.array([4,4])
 
         if np.array_equal(self._agent_location, np.array([1,2])):
             self.reward_matrix[1,2] = -1
             self.reward_matrix[3,0] = -1
+
+            # This exists to remove diamond from the rendered screen
             self._bdiamond_location = np.array([4,4])
             self._ydiamond_location = np.array([4,4])
 

@@ -8,27 +8,31 @@ import os
 log_path = os.path.join('Training', 'Logs')
 env = GridWorldEnv3(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
-model = PPO('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path,batch_size=5)
+model = PPO('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path)
 obs = env.reset()
 
 env_see = GridWorldEnv3(render_mode="human")
-env_see.reset()
+env_see.reset(exec=True)
 
 
 
-env_see.reset()
-model.learn(total_timesteps=60000)
+
+model.learn(total_timesteps=200000)
 done =  False
 print(f'Estado: {obs}')
-total_reward = 0
-while not done:
-    action, _states = model.predict(obs)
-    obs, rewards, done, info = env_see.step(action.astype(int))
-    env_see.render()
-    total_reward += rewards
-    print(f'Estado: {obs}')
-    print(f'ACAO: {action.astype(int)}')
-    print(f'Recompensa: {rewards}')
-    time.sleep(1)
-
-print(f'RECOMPENSA TOTAL: {total_reward}')
+times_to_execute = 10
+while times_to_execute > 0:
+    obs = env_see.reset(exec=True)
+    times_to_execute -= 1
+    total_reward = 0
+    while not env_see.terminated:
+        action, _states = model.predict(obs)
+        obs, rewards, done, info = env_see.step(action.astype(int))
+        env_see.render()
+        total_reward += rewards
+        print(f'Estado: {obs}')
+        print(f'ACAO: {action.astype(int)}')
+        print(f'Recompensa: {rewards}')
+        time.sleep(1)
+        
+    print(f'RECOMPENSA TOTAL: {total_reward}')

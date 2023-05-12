@@ -28,19 +28,21 @@ env_see.reset()
 
 # env.close()
 
-env_see.reset()
 model.learn(total_timesteps=100000)
 done =  False
 print(f'Estado: {obs}')
 total_reward = 0
-while not done:
-    action, _states = model.predict(obs)
-    obs, rewards, done, info = env_see.step(action.astype(int))
-    env_see.render()
-    total_reward += rewards
-    print(f'Estado: {obs}')
-    print(f'ACAO: {action.astype(int)}')
-    print(f'Recompensa: {rewards}')
-    time.sleep(1)
-
-print(f'RECOMPENSA TOTAL: {total_reward}')
+times_to_execute = 5
+while times_to_execute>0:
+    obs = env_see.reset()
+    times_to_execute-=1
+    while not done:
+        action, _states = model.predict(obs)
+        obs, rewards, done, info = env_see.step(action.astype(int))
+        env_see.render()
+        total_reward += rewards
+        print(f'Estado: {obs}')
+        print(f'ACAO: {action.astype(int)}')
+        print(f'Recompensa: {rewards}')
+        time.sleep(1)
+    print(f'RECOMPENSA TOTAL: {total_reward}')
