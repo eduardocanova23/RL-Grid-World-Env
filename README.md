@@ -8,5 +8,6 @@ The versions are the following:<br>
 4 - Position and timestamp are accounted <br>
 5 - Binary verison of 3: instead of reward value, there is a binary marker that says wether it's a positive reward or a negative reward <br>
 6 - Same as 1 but the rewards don't vanish when collected <br>
-7
-8 - State is the existence of yellow or blue diamonds in each position. The goal is fixed in (1,3)
+7 - <br>
+8 - State is the existence of yellow or blue diamonds in each position. The goal is fixed in (1,3) <br>
+9 - State is a mean of all rewards that are in some direction of the agent weighted on the distance to each reward to it <br>
