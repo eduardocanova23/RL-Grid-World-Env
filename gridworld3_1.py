@@ -10,13 +10,13 @@ import pygame
 import math
 
 font = cv2.FONT_HERSHEY_COMPLEX_SMALL 
-class GridWorldEnv3(gym.Env):
+class GridWorldEnv3_1(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
 
     def __init__(self,render_mode=None,size=4,exploration_max=0.90,exploration_min=0,exploration_decay=1.0,gamma=1,max_steps=18,learning_rate=1):
         self.size = size  # The size of the square grid
         self.window_size = 512  # The size of the PyGame window
-        self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[14, -1,-1,-1]])
+        self.reward_matrix = np.array([[-1,3,-1,-1],[-1,-1,-1,10], [-1, -1,14,-1],[-1, -1,-1,-1]])
         # Observations are dictionaries with the agent's and the target's location.
         # Each location is encoded as an element of {0, ..., `size`}^2, i.e. MultiDiscrete([size, size]).
         self.observation_space = spaces.Dict(
@@ -81,7 +81,7 @@ class GridWorldEnv3(gym.Env):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
         self.total_reward = 0
-        self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,3,10], [-1, -1,-1,-1],[14, -1,-1,-1]])
+        self.reward_matrix = np.array([[-1,3,-1,-1],[-1,-1,-1,10], [-1, -1,14,-1],[-1, -1,-1,-1]])
         self._target_location = np.array([1, 3])
         # Choose the agent's location uniformly at random
         if not exec:
@@ -154,8 +154,8 @@ class GridWorldEnv3(gym.Env):
         self._down = self._reward_to_obs[self.reward_matrix[future_location[0], future_location[1]]]
 
 
-        self._ydiamond_location = np.array([3,0])
-        self._bdiamond_location = np.array([1,2])
+        self._ydiamond_location = np.array([2,2])
+        self._bdiamond_location = np.array([0,1])
 
         observation = self._get_obs()
         info = self._get_info()
@@ -253,18 +253,19 @@ class GridWorldEnv3(gym.Env):
         reward = self.reward_matrix[self._agent_location[0], self._agent_location[1]]
         self.total_reward += reward
 
+        # reward matrix = np.array([[3,-1,-1,-1],[-1,-1,-1,10], [-1, -1,14,-1],[-1, -1,-1,-1]])
         # Update reward matrix by deleting collected diamond and the uncollected diamond counterpart
-        if np.array_equal(self._agent_location, np.array([3,0])):
-            self.reward_matrix[3,0] = -1
-            self.reward_matrix[1,2] = -1
+        if np.array_equal(self._agent_location, np.array([0,1])):
+            self.reward_matrix[0,1] = -1
+            self.reward_matrix[2,2] = -1
 
             # This exists to remove diamond from the rendered screen
             self._ydiamond_location = np.array([4,4])
             self._bdiamond_location = np.array([4,4])
 
-        if np.array_equal(self._agent_location, np.array([1,2])):
-            self.reward_matrix[1,2] = -1
-            self.reward_matrix[3,0] = -1
+        if np.array_equal(self._agent_location, np.array([2,2])):
+            self.reward_matrix[2,2] = -1
+            self.reward_matrix[0,1] = -1
 
             # This exists to remove diamond from the rendered screen
             self._bdiamond_location = np.array([4,4])

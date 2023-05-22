@@ -1,4 +1,4 @@
-from gridworld3 import GridWorldEnv3
+from gridworld3_0 import GridWorldEnv3_0
 import gym
 import time
 from stable_baselines3 import A2C
@@ -6,12 +6,12 @@ from stable_baselines3.common.env_util import make_vec_env
 import os
 
 log_path = os.path.join('Training', 'Logs')
-env = GridWorldEnv3(render_mode="rgb_array")
+env = GridWorldEnv3_0(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 model = A2C('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path)
 obs = env.reset()
 
-env_see = GridWorldEnv3(render_mode="human")
+env_see = GridWorldEnv3_0(render_mode="human")
 env_see.reset()
 
 # while True:

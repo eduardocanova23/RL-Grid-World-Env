@@ -1,10 +1,10 @@
-from gridworld3 import GridWorldEnv3
+from gridworld3_0 import GridWorldEnv3_0
 import gym
 import time
 import os
 import winsound
 
-env = GridWorldEnv3(render_mode="rgb_array")
+env = GridWorldEnv3_0(render_mode="rgb_array")
 #env = DummyVecEnv([lambda: env]) 
 obs = env.reset()
 
