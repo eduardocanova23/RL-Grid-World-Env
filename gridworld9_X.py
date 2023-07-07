@@ -16,8 +16,9 @@ class GridWorldEnv9_X(gym.Env):
     def __init__(self,render_mode=None,size=4,exploration_max=0.90,exploration_min=0,exploration_decay=1.0,gamma=1,max_steps=18,learning_rate=1):
         self.size = size  # The size of the square grid
         self.window_size = 512  # The size of the PyGame window
-        self.reward_matrix = np.array([[3,-1,-1,-1],[-1,-1,-1,10], [-1, -1,-1,-1],[-1, -1,-1,14]])
-        self.diamond_matrix = np.array([["b",-1,-1,-1],[-1,-1,-1,"g"], [-1, -1,-1,-1],[-1, -1,-1,"y"]])
+        self.reward_matrix = np.array([[-1 for _ in range(self.size)] for _ in range(self.size)])
+        self.reward_matrix[1][-1] = 10
+        
         # -1 means no diamond, "y" means yellow diamond, "b" means blue diamond and "g" means goal
 
         self.reach = self.size//2
@@ -134,7 +135,7 @@ class GridWorldEnv9_X(gym.Env):
     def distance_from_agent(self, position):
         lower_bound = 0
         upper_bound = self.size - 1
-        distance = 0
+        distance = 1
 
         if self._agent_location[0] > position[0]:
             agent_dist_wall_right = upper_bound - self._agent_location[0]
@@ -231,7 +232,7 @@ class GridWorldEnv9_X(gym.Env):
         coordinates = self._get_coordinates_weights_left()
         sum = 0
         for coord, weight in coordinates:
-            sum += self.reward_matrix[coord[0], coord[1]] * weight
+            sum += (self.reward_matrix[coord[0]][coord[1]]) * weight
 
         mean = sum / self.total_weight
         return mean
@@ -240,7 +241,7 @@ class GridWorldEnv9_X(gym.Env):
         coordinates = self._get_coordinates_weights_right()
         sum = 0
         for coord, weight in coordinates:
-            sum += self.reward_matrix[coord[0], coord[1]] * weight
+            sum += (self.reward_matrix[coord[0]][coord[1]]) * weight
 
         mean = sum / self.total_weight
         return mean
@@ -249,7 +250,7 @@ class GridWorldEnv9_X(gym.Env):
         coordinates = self._get_coordinates_weights_up()
         sum = 0
         for coord, weight in coordinates:
-            sum += self.reward_matrix[coord[0], coord[1]] * weight
+            sum += (self.reward_matrix[coord[0]][coord[1]]) * weight
 
         mean = sum / self.total_weight
         return mean
@@ -258,7 +259,7 @@ class GridWorldEnv9_X(gym.Env):
         coordinates = self._get_coordinates_weights_down()
         sum = 0
         for coord, weight in coordinates:
-            sum += self.reward_matrix[coord[0], coord[1]] * weight
+            sum += (self.reward_matrix[coord[0]][coord[1]]) * weight
 
         mean = sum / self.total_weight
         return mean
@@ -270,8 +271,9 @@ class GridWorldEnv9_X(gym.Env):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
         self.total_reward = 0
-        self.reward_matrix = np.array([[-1,-1,-1,-1],[-1,-1,-1,10], [-1, -1,-1,-1],[-1, -1,-1,-1]])
-        self._target_location = np.array([1, 3])
+        self.reward_matrix = [[-1 for _ in range(self.size)] for _ in range(self.size)]
+        self.reward_matrix[1][-1] = 10
+        self._target_location = np.array([1, self.size-1])
 
         self._bdiamond_location = self.np_random.integers(0, self.size, size=2, dtype=int)
             # We will sample the blue diamond location randomly until it does not coincide with the target's location
@@ -284,8 +286,10 @@ class GridWorldEnv9_X(gym.Env):
         while np.array_equal(self._target_location, self._ydiamond_location) or np.array_equal(self._ydiamond_location, self._bdiamond_location):
             self._ydiamond_location = self.np_random.integers(0, self.size, size=2, dtype=int)
 
-        self.reward_matrix[self._bdiamond_location[0],self._bdiamond_location[1]] = 3
-        self.reward_matrix[self._ydiamond_location[0],self._ydiamond_location[1]] = 14
+        self.reward_matrix[self._bdiamond_location[0]][self._bdiamond_location[1]] = 3
+        
+        self.reward_matrix[self._ydiamond_location[0]][self._ydiamond_location[1]] = 14
+        
 
         # Choose the agent's location uniformly at random
         if not exec:
@@ -321,17 +325,17 @@ class GridWorldEnv9_X(gym.Env):
         new_location = self._agent_location + direction
 
         # Tests in case of teleport to the other side
-        if new_location[0]>3:
-            self._agent_location += np.array([-3, 0])
+        if new_location[0]>self.size-1:
+            self._agent_location += np.array([-(self.size-1), 0])
 
         elif new_location[0]<0:
-            self._agent_location += np.array([3, 0])
+            self._agent_location += np.array([(self.size-1), 0])
 
-        elif new_location[1]>3:
-            self._agent_location += np.array([0, -3])
+        elif new_location[1]>self.size-1:
+            self._agent_location += np.array([0, -(self.size-1)])
 
         elif new_location[1]<0:
-            self._agent_location += np.array([0, 3])
+            self._agent_location += np.array([0, (self.size-1)])
 
         # No teleports
         else:
@@ -340,29 +344,25 @@ class GridWorldEnv9_X(gym.Env):
         self.terminated = np.array_equal(self._agent_location, self._target_location)
 
 
-        reward = self.reward_matrix[self._agent_location[0], self._agent_location[1]]
+        reward = self.reward_matrix[self._agent_location[0]][self._agent_location[1]]
         self.total_reward += reward
 
         # Update reward matrix by deleting collected diamond and the uncollected diamond counterpart
         if np.array_equal(self._agent_location, self._ydiamond_location):
-            self.reward_matrix[self._ydiamond_location[0],self._ydiamond_location[1]] = -1
-            self.reward_matrix[self._bdiamond_location[0],self._bdiamond_location] = -1
-            self.diamond_matrix[self._ydiamond_location[0],self._ydiamond_location] = -1
-            self.diamond_matrix[self._bdiamond_location[0],self._bdiamond_location] = -1
+            self.reward_matrix[self._ydiamond_location[0]][self._ydiamond_location[1]] = -1
+            self.reward_matrix[self._bdiamond_location[0]][self._bdiamond_location[1]] = -1
 
             # This exists to remove diamond from the rendered screen
-            self._ydiamond_location = np.array([4,4])
-            self._bdiamond_location = np.array([4,4])
+            self._ydiamond_location = np.array([self.size,self.size])
+            self._bdiamond_location = np.array([self.size,self.size])
 
         if np.array_equal(self._agent_location, self._bdiamond_location):
-            self.reward_matrix[self._bdiamond_location[0],self._bdiamond_location] = -1
-            self.reward_matrix[self._ydiamond_location[0],self._ydiamond_location] = -1
-            self.diamond_matrix[self._bdiamond_location[0],self._bdiamond_location] = -1
-            self.diamond_matrix[self._ydiamond_location[0],self._ydiamond_location] = -1
+            self.reward_matrix[self._bdiamond_location[0]][self._bdiamond_location[1]] = -1
+            self.reward_matrix[self._ydiamond_location[0]][self._ydiamond_location[1]] = -1
 
             # This exists to remove diamond from the rendered screen
-            self._bdiamond_location = np.array([4,4])
-            self._ydiamond_location = np.array([4,4])
+            self._bdiamond_location = np.array([self.size,self.size])
+            self._ydiamond_location = np.array([self.size,self.size])
 
 
         self.mean_left = np.array([self._get_weighted_mean_left()])

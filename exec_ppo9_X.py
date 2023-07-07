@@ -6,12 +6,12 @@ from stable_baselines3.common.env_util import make_vec_env
 import os
 
 log_path = os.path.join('Training', 'Logs')
-env = GridWorldEnv9_X(render_mode="rgb_array")
+env = GridWorldEnv9_X(render_mode="rgb_array", size=5)
 #env = DummyVecEnv([lambda: env]) 
 model = PPO('MultiInputPolicy',env,verbose=1,tensorboard_log=log_path)
 obs = env.reset()
 
-env_see = GridWorldEnv9_X(render_mode="human")
+env_see = GridWorldEnv9_X(render_mode="human", size=5)
 env_see.reset(exec=True)
 
 
