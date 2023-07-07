@@ -11,3 +11,13 @@ The versions are the following:<br>
 7 - <br>
 8 - State is the existence of yellow or blue diamonds in each position. The goal is fixed in (1,3) <br>
 9 - State is a mean of all rewards that are in some direction of the agent weighted on the distance to each reward to it <br>
+
+
+pygame
+Version: 2.3.0 <br>
+
+stable-baselines3
+Version: 1.8.0 <br>
+
+gym
+Version: 0.26.2 <br>
